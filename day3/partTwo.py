@@ -1,104 +1,60 @@
 #!/usr/bin/env python3
+import locale
 
 file = open("puzzleInput.txt", 'r')
 
-charArr = []
-charC = 0
-checkR = [str(i) for i in range(0, 10)]
+contents = file.readlines()
+
+check_range = [str(i) for i in range(10)]
+
+length = len(contents)
+LENGTH = 141 # length of each row, a fixed thing
+             # DON'T CONFUSE THE `length` and `LENGTH`
 
 def extractNum(line, pos):
-    retNum = '0'
-    ppos = pos
-    while True:
-        if pos < len(line) and line[pos] in checkR:
-            if ppos != 0 and line[ppos - 1] not in checkR:
-                retNum += line[pos]
-                pos += 1
-            elif ppos == 0:
-                retNum += line[pos]
-                pos += 1
-            else:
+    """
+        Function to Extract Number from a specific line
+        (string, which is stored in the `contents` array)
 
-                break
+        Works properly Only IFF the char of string in the
+        `pos` index is in the set {'1, 2, 3, 4, 5, 6, 7, 8, 9'}
+        (logic in this case:
+        belongs to check_range)
+    """
+    retNum = '0'
+    while True:
+        if line[pos] in check_range:
+            retNum += line[pos]
+            pos += 1
         else:
             break
 
     return int(retNum)
 
+def gearFinder(contents):
+    for i in range(length):
+        check_string = contents[i]
+        for j in range(LENGTH):
+            if check_string[j] == '*':
+                rowChecker(contents, i, j)
+
+def rowChecker(contents, posR, posC): # Short for position
+    #POSITION_ROW and POSITION_COLUMN
+
+    if (posR != 0 and posR != length - 1):
+        colChecker()
+
+def colChecker(contents, posR, posC, flag=0): # flag: 0 -> middle-row
+                                              #       1 -> top-most row
+                                              #      -1 -> bottom-most row
 
 
-for line in file:
-    charArr.append(line.strip())
-    charC += 1
+    count = 0
 
-def iterateSolve(arr):
-    allNumsArr = []
-    s = 0
-    for l in range(len(arr)):
-        liStr = arr[l]
-        for i in range(len(liStr)):
-            if (liStr[i]) in checkR:
-                num = extractNum(liStr, i)
-                if num != 0:
-                    allNumsArr.append(num)
-                    boolVal = checkPart(l, arr, num, i)
-                    if boolVal:
-                        s += num
+    if flag == 0:
+        checkR = contents[posR]
+        up = contents[posR - 1]
+        down = contents[posR + 1]
 
-            else:
-                continue
-
-    return s
-     
-def checkPart(l, arr, num, pos):
-    length = len(arr)
-    numlen = len(str(num))
-    if (l != 0 and l != length - 1):
-        for x in range(-1, 2):
-            if (pos != 0 and pos + numlen - 1 != len(arr[l]) - 1):
-                for i in range(-1, numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos == 0:
-                for i in range(numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos + numlen - 1 == length - 1:
-                for i in range(-1, 0):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-
-    elif (l == 0):
-        for x in range(0, 2):
-            if (pos != 0 and pos + numlen != len(arr[l]) - 1):
-                for i in range(-1, numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos == 0:
-                for i in range(numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos +numlen - 1 == length - 1:
-                for i in range(-1, 0):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-
-    elif (l == length - 1):
-        for x in range(-1, 1):
-            if (pos != 0 and pos + numlen != len(arr[l]) - 1):
-                for i in range(-1, numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos == 0:
-                for i in range(numlen + 1):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-            elif pos + numlen- 1== length - 1:
-                for i in range(-1, 0):
-                    if arr[l + x][pos + i] not in checkR and arr[l + x][pos + i] != '.':
-                        return True
-
-    return False
-
-
-print(iterateSolve(charArr))
+        for i in range(-1, 2):
+            if checkR[posC + i] in check_range
